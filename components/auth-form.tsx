@@ -165,6 +165,11 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
         </div>
       )}
 
+      {/* Developer Info */}
+      <div className="absolute bottom-4 text-sm font-medium text-muted-foreground/60 tracking-wide text-center w-full pointer-events-none">
+        Geliştirici <span className="text-foreground/70">Recep Aydoğan</span>
+      </div>
+
       {/* Decorative background glow */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px] -z-10 pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[120px] -z-10 pointer-events-none" />

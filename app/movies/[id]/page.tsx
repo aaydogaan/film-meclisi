@@ -62,24 +62,24 @@ export default async function MovieDetailsPage({ params }: { params: Promise<{ i
       <AppHeader name={user.user_metadata?.name ?? user.email ?? ''} email={user.email ?? ''} avatarUrl={user.user_metadata?.avatar_url} />
       
       {/* Hero Section */}
-      <div className="relative w-full h-[60vh] sm:h-[70vh] bg-background overflow-hidden flex items-end">
+      <div className="relative w-full min-h-[60vh] sm:min-h-[70vh] bg-background flex flex-col justify-end">
         {movie.poster_url ? (
           <>
             <div 
-              className="absolute inset-0 bg-cover bg-center opacity-40 blur-xl scale-110"
+              className="absolute inset-0 bg-cover bg-top sm:bg-center sm:opacity-40 sm:blur-xl sm:scale-110"
               style={{ backgroundImage: `url(${movie.poster_url})` }}
             />
             {/* Gradients to blend with background */}
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 sm:via-background/80 to-transparent" />
+            <div className="absolute inset-0 sm:bg-gradient-to-r from-background via-background/40 to-transparent hidden sm:block" />
           </>
         ) : (
           <div className="absolute inset-0 bg-secondary/10" />
         )}
         
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 pb-12 flex flex-col sm:flex-row gap-6 sm:gap-10 items-center sm:items-end">
-          {/* Poster */}
-          <div className="w-40 sm:w-64 shrink-0 rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-card mx-auto sm:mx-0 mt-8 sm:mt-0">
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 pb-8 sm:pb-12 flex flex-col sm:flex-row gap-6 sm:gap-10 items-center sm:items-end mt-40 sm:mt-0">
+          {/* Poster - Only visible on desktop */}
+          <div className="hidden sm:block w-64 shrink-0 rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-card">
             {movie.poster_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={movie.poster_url} alt={movie.title} className="w-full aspect-[2/3] object-cover" />

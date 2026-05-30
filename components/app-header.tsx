@@ -39,11 +39,13 @@ export function AppHeader({ name, email, avatarUrl }: { name: string; email: str
     <header className="sticky top-0 z-30 border-b border-border bg-background/80 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
         <div className="flex items-center gap-2.5">
-          <img 
-            src="/images/film-meclisi-logo.png" 
-            alt="Film Meclisi Logo" 
-            className="h-14 sm:h-16 w-auto object-contain"
-          />
+          <Link href="/">
+            <img 
+              src="/images/film-meclisi-logo.png" 
+              alt="Film Meclisi Logo" 
+              className="h-14 sm:h-16 w-auto object-contain cursor-pointer"
+            />
+          </Link>
         </div>
 
         <div className="hidden sm:flex items-center gap-1">
