@@ -46,37 +46,41 @@ export function AppHeader({ name, email, avatarUrl }: { name: string; email: str
         </div>
 
         <div className="hidden sm:flex items-center gap-1">
-          <Button variant="ghost" size="icon" onClick={() => router.push('/')} title="Ana Sayfa">
-            <Home className="h-5 w-5" />
-            <span className="sr-only">Ana Sayfa</span>
+          <Button variant="ghost" size="icon" asChild title="Ana Sayfa">
+            <Link href="/">
+              <Home className="h-5 w-5" />
+              <span className="sr-only">Ana Sayfa</span>
+            </Link>
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => router.push('/watchlist')} title="İlk İzlenecekler">
-            <Clock className="h-5 w-5" />
-            <span className="sr-only">İlk İzlenecekler</span>
+          <Button variant="ghost" size="icon" asChild title="Liderlik Tablosu">
+            <Link href="/leaderboard">
+              <Trophy className="h-5 w-5" />
+              <span className="sr-only">Liderlik Tablosu</span>
+            </Link>
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => router.push('/rankings')} title="Film Sıralaması">
-            <Star className="h-5 w-5" />
-            <span className="sr-only">Film Sıralaması</span>
+          <Button variant="ghost" size="icon" asChild title="Listeler">
+            <Link href="/lists">
+              <List className="h-5 w-5" />
+              <span className="sr-only">Listeler</span>
+            </Link>
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => router.push('/leaderboard')} title="Liderlik Tablosu">
-            <Trophy className="h-5 w-5" />
-            <span className="sr-only">Liderlik Tablosu</span>
+          <Button variant="ghost" size="icon" asChild title="İstatistikler">
+            <Link href="/statistics">
+              <BarChart3 className="h-5 w-5" />
+              <span className="sr-only">İstatistikler</span>
+            </Link>
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => router.push('/lists')} title="Listeler">
-            <List className="h-5 w-5" />
-            <span className="sr-only">Listeler</span>
+          <Button variant="ghost" size="icon" asChild title="Öneriler">
+            <Link href="/recommendations">
+              <Share2 className="h-5 w-5" />
+              <span className="sr-only">Öneriler</span>
+            </Link>
           </Button>
-          <Button variant="ghost" size="icon" onClick={() => router.push('/statistics')} title="İstatistikler">
-            <BarChart3 className="h-5 w-5" />
-            <span className="sr-only">İstatistikler</span>
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => router.push('/recommendations')} title="Öneriler">
-            <Share2 className="h-5 w-5" />
-            <span className="sr-only">Öneriler</span>
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => router.push('/users')} title="Kullanıcılar">
-            <Users className="h-5 w-5" />
-            <span className="sr-only">Kullanıcılar</span>
+          <Button variant="ghost" size="icon" asChild title="Kullanıcılar">
+            <Link href="/users">
+              <Users className="h-5 w-5" />
+              <span className="sr-only">Kullanıcılar</span>
+            </Link>
           </Button>
         </div>
 
@@ -112,9 +116,28 @@ export function AppHeader({ name, email, avatarUrl }: { name: string; email: str
                 </span>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut}>
+              <DropdownMenuItem asChild>
+                <Link href={`/users/${userId || ''}`}>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profilim</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/watchlist">
+                  <Bookmark className="mr-2 h-4 w-4" />
+                  <span>İzlenecekler ({watchlistCount})</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/recommendations">
+                  <Share2 className="mr-2 h-4 w-4" />
+                  <span>Gelen Öneriler ({unreadCount})</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={handleSignOut}>
                 <LogOut className="mr-2 h-4 w-4" />
-                Çıkış yap
+                <span>Çıkış yap</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
