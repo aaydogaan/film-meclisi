@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { getMovies, getRecentActivities } from '@/app/actions/movies'
+import { getMovies, getRecentActivities, getAllUsers } from '@/app/actions/movies'
 import { AppHeader } from '@/components/app-header'
 import { MovieLibrary } from '@/components/movie-library'
 import { MessageSquare, Share2, Eye, Star } from 'lucide-react'
@@ -12,12 +12,13 @@ export default async function HomePage() {
 
   const movies = await getMovies()
   const activities = await getRecentActivities(5)
+  const allUsers = await getAllUsers()
 
   return (
     <div className="min-h-svh bg-gradient-to-b from-background to-muted/20">
       <AppHeader name={user.user_metadata?.name ?? user.email ?? ''} email={user.email ?? ''} avatarUrl={user.user_metadata?.avatar_url} />
       <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-        <MovieLibrary movies={movies} currentUser={user} />
+        <MovieLibrary movies={movies} currentUser={user} allUsers={allUsers} />
 
         {activities.length > 0 && (
           <div className="mt-12 mb-8 p-4 rounded-xl border border-border bg-card/40 backdrop-blur-sm max-w-3xl">

@@ -14,11 +14,12 @@ import {
 import { MovieCard } from '@/components/movie-card'
 import { MovieDialog } from '@/components/movie-dialog'
 
-export function MovieLibrary({ movies, currentUser }: { movies: any[]; currentUser: any }) {
+export function MovieLibrary({ movies, currentUser, allUsers }: { movies: any[]; currentUser: any; allUsers?: any[] }) {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<any | null>(null)
   const [search, setSearch] = useState('')
   const [genre, setGenre] = useState('all')
+  const [statusFilter, setStatusFilter] = useState('all')
 
   const genres = useMemo(() => {
     const set = new Set<string>()
@@ -30,6 +31,21 @@ export function MovieLibrary({ movies, currentUser }: { movies: any[]; currentUs
     const q = search.trim().toLocaleLowerCase('tr')
     return movies.filter((m) => {
       if (genre !== 'all' && m.genre !== genre) return false
+
+      if (statusFilter !== 'all') {
+        if (statusFilter === 'watched') {
+          const watcher = m.movie_watchers?.find((w: any) => w.user_id === currentUser.id)
+          if (!watcher || watcher.status !== 'watched') return false
+        } else if (statusFilter === 'unwatched') {
+          const watcher = m.movie_watchers?.find((w: any) => w.user_id === currentUser.id)
+          if (watcher && watcher.status === 'watched') return false 
+        } else if (statusFilter.startsWith('user_')) {
+          const uId = statusFilter.split('_')[1]
+          const watcher = m.movie_watchers?.find((w: any) => w.user_id === uId)
+          if (!watcher || watcher.status !== 'watched') return false
+        }
+      }
+
       if (q) {
         const haystack = [m.title, m.director, m.genre]
           .filter(Boolean)
@@ -39,7 +55,7 @@ export function MovieLibrary({ movies, currentUser }: { movies: any[]; currentUs
       }
       return true
     })
-  }, [movies, genre, search])
+  }, [movies, genre, search, statusFilter, currentUser.id])
 
   const openAdd = () => {
     setEditing(null)
@@ -73,7 +89,7 @@ export function MovieLibrary({ movies, currentUser }: { movies: any[]; currentUs
             />
           </div>
           <Select value={genre} onValueChange={setGenre}>
-            <SelectTrigger className="sm:w-48">
+            <SelectTrigger className="sm:w-32">
               <SelectValue placeholder="Tür" />
             </SelectTrigger>
             <SelectContent>
@@ -83,6 +99,27 @@ export function MovieLibrary({ movies, currentUser }: { movies: any[]; currentUs
                   {g}
                 </SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="sm:w-48">
+              <SelectValue placeholder="Durum" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tüm Durumlar</SelectItem>
+              <SelectItem value="watched">İzlediklerim</SelectItem>
+              <SelectItem value="unwatched">İzlenmeyenler</SelectItem>
+              {allUsers && allUsers.length > 0 && (
+                <div className="pt-2 mt-2 border-t border-border/50">
+                  <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Üyelere Göre:</div>
+                  {allUsers.filter(u => u.id !== currentUser.id).map((u: any) => (
+                    <SelectItem key={`user_${u.id}`} value={`user_${u.id}`}>
+                      {u.name || u.email.split('@')[0]} (İzledikleri)
+                    </SelectItem>
+                  ))}
+                </div>
+              )}
             </SelectContent>
           </Select>
         </div>

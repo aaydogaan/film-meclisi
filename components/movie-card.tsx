@@ -62,7 +62,20 @@ export function MovieCard({ movie, onEdit, currentUser }: MovieCardProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [hasCommented, setHasCommented] = useState(false)
   const [watchStatus, setWatchStatus] = useState<string>('')
+  const [imdbRating, setImdbRating] = useState<string | null>(null)
   const { toast } = useToast()
+
+  useEffect(() => {
+    if (movie.title) {
+      const yearStr = movie.year ? `&y=${movie.year}` : ''
+      fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(movie.title)}${yearStr}&apikey=${process.env.NEXT_PUBLIC_OMDB_API_KEY || 'efbf9335'}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.imdbRating && data.imdbRating !== 'N/A') setImdbRating(data.imdbRating)
+        })
+        .catch(() => {})
+    }
+  }, [movie.title, movie.year])
 
   const validRatings = movie.movie_watchers?.filter((w: any) => typeof w.rating === 'number' && w.rating > 0) || []
   const averageRating = validRatings.length > 0 
@@ -338,12 +351,21 @@ export function MovieCard({ movie, onEdit, currentUser }: MovieCardProps) {
         )}
 
         <div className="mt-auto pt-2 pb-1">
-          {averageRating ? (
+          {averageRating || imdbRating ? (
             <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-1.5 px-1 text-xs text-muted-foreground border-t pt-2 border-border/50">
-              <span className="flex items-center gap-1 font-medium" title="Film Meclisi Puanı">
-                <Star className="h-3.5 w-3.5 shrink-0 fill-yellow-500 text-yellow-500" />
-                <span className="text-foreground font-bold text-yellow-500">{averageRating}</span> 
-                <span className="text-[10px] hidden sm:inline">/ 10</span>
+              <span className="flex items-center gap-2">
+                {imdbRating && (
+                  <span className="flex items-center gap-1 font-medium" title="IMDb Puanı">
+                    <span className="font-bold text-yellow-400 bg-black/80 px-1 py-0.5 rounded text-[10px]">IMDb</span>
+                    <span className="text-foreground font-bold">{imdbRating}</span>
+                  </span>
+                )}
+                {averageRating && (
+                  <span className="flex items-center gap-1 font-medium" title="Film Meclisi Puanı">
+                    <Star className="h-3.5 w-3.5 shrink-0 fill-yellow-500 text-yellow-500" />
+                    <span className="text-foreground font-bold text-yellow-500">{averageRating}</span> 
+                  </span>
+                )}
               </span>
               <span className="flex items-center gap-1" title="Toplam Yorum">
                 <MessageSquare className="h-3.5 w-3.5 shrink-0" />
