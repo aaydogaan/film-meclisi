@@ -22,11 +22,9 @@ export function MovieCommentForm({
   const handleSubmit = async (formData: FormData) => {
     setLoading(true)
     const comment = formData.get('comment') as string
-    const name = formData.get('anonymous_name') as string || defaultName
-
     try {
       if (comment?.trim()) {
-        await addMovieComment(movieId, comment, name)
+        await addMovieComment(movieId, comment, defaultName)
         // Reset form
         const form = document.getElementById('comment-form') as HTMLFormElement
         if (form) form.reset()
@@ -43,12 +41,6 @@ export function MovieCommentForm({
     <form id="comment-form" action={handleSubmit} className="mb-8 p-5 bg-card border border-border rounded-xl shadow-sm">
       <h3 className="font-semibold mb-3">Yorum Yap</h3>
       <div className="space-y-3">
-        <Input 
-          name="anonymous_name" 
-          placeholder="Görünecek Ad (İsteğe bağlı)" 
-          defaultValue={defaultName}
-          className="max-w-xs"
-        />
         <Textarea 
           name="comment" 
           placeholder={`${movieTitle} hakkında ne düşünüyorsun?`} 

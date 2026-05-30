@@ -36,14 +36,10 @@ type MovieCardProps = {
   currentUser: any
 }
 
-const ANONYMOUS_NAMES = [
-  'Gizli Eleştirmen', 'Sinema Sever', 'Gece Kuşu', 'Popcorn Aşığı',
-  'Karanlık Izgara', 'Film Kurtu', 'Perde Arkası', 'Biletçi',
-  'Yönetmen Koltuğu', 'Spot Işığı', 'Kurgu Ustası', 'Senaryo Yazan'
-]
+const ANONYMOUS_NAMES = []
 
 function getRandomAnonymousName() {
-  return ANONYMOUS_NAMES[Math.floor(Math.random() * ANONYMOUS_NAMES.length)]
+  return ''
 }
 
 export function MovieCard({ movie, onEdit, currentUser }: MovieCardProps) {
@@ -201,10 +197,15 @@ export function MovieCard({ movie, onEdit, currentUser }: MovieCardProps) {
   const handleAddComment = () => {
     if (!comment.trim()) return
     startTransition(() => {
-      addMovieComment(movie.id, comment, anonymousName)
+      const defaultName = currentUser?.user_metadata?.name || currentUser?.email?.split('@')[0] || 'İsimsiz'
+      addMovieComment(movie.id, comment, defaultName).then(() => {
+        if (commentsDialogOpen) {
+          getMovieComments(movie.id).then(setComments)
+          setHasCommented(true)
+        }
+      })
       setCommentDialogOpen(false)
       setComment('')
-      setAnonymousName(getRandomAnonymousName())
     })
   }
 
@@ -458,22 +459,8 @@ export function MovieCard({ movie, onEdit, currentUser }: MovieCardProps) {
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Bu film hakkında ne düşünüyorsun?"
-                rows={3}
+                rows={4}
               />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="anonymousName">Gizli ismin</Label>
-              <input
-                id="anonymousName"
-                type="text"
-                value={anonymousName}
-                onChange={(e) => setAnonymousName(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md"
-                placeholder="Esprili bir isim seç..."
-              />
-              <p className="text-xs text-muted-foreground">
-                Yorumların bu isimle görünecek
-              </p>
             </div>
           </div>
           <DialogFooter>
@@ -506,6 +493,27 @@ export function MovieCard({ movie, onEdit, currentUser }: MovieCardProps) {
                     <p className="text-sm">{comment.comment}</p>
                   </div>
                 ))}
+              </div>
+            )}
+            
+            {!hasCommented && watchStatus === 'watched' && (
+              <div className="mt-4 flex flex-col gap-3 p-4 bg-secondary/30 rounded-xl border border-border">
+                <Label htmlFor="inline-comment" className="text-sm font-semibold">Senin Yorumun</Label>
+                <Textarea
+                  id="inline-comment"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Bu film hakkında ne düşünüyorsun?"
+                  rows={2}
+                  className="bg-background"
+                />
+                <Button 
+                  onClick={handleAddComment} 
+                  disabled={isPending || !comment.trim()} 
+                  className="self-end"
+                >
+                  {isPending ? 'Gönderiliyor...' : 'Yayınla'}
+                </Button>
               </div>
             )}
           </div>
