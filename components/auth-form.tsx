@@ -392,17 +392,21 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
               100% { transform: translateY(-100%); }
             }
             .animate-credits-popup {
-              animation: creditsScrollPopup 30s linear forwards;
+              animation: creditsScrollPopup 40s linear forwards;
             }
           `}</style>
           
           <div className="animate-credits-popup flex flex-col items-center text-center space-y-16 text-white w-full max-w-2xl px-4 absolute top-0 pb-32">
             <div className="space-y-4 mb-8">
-              <h2 className="text-3xl md:text-5xl font-bold tracking-widest uppercase">Film Meclisi</h2>
+              <img 
+                src="/images/film-meclisi-logo.png" 
+                alt="Film Meclisi Logo" 
+                className="h-32 sm:h-48 w-auto object-contain mx-auto drop-shadow-2xl"
+              />
             </div>
             
             <div className="space-y-2">
-              <h3 className="text-sm md:text-lg uppercase tracking-widest text-white/60">Fikir & Kod Yazan vs.</h3>
+              <h3 className="text-sm md:text-lg uppercase tracking-widest text-white/60">Fikir & Kod Yazan</h3>
               <p className="text-xl md:text-3xl font-semibold">Recep Aydoğan</p>
             </div>
 
@@ -429,6 +433,24 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
             <div className="space-y-2">
               <h3 className="text-sm md:text-lg uppercase tracking-widest text-white/60">Özel Teşekkürler</h3>
               <p className="text-xl md:text-3xl font-semibold">Uykusuz Geceler</p>
+            </div>
+
+            <div className="space-y-8 pt-12 max-w-lg mx-auto">
+              <h3 className="text-sm md:text-lg uppercase tracking-widest text-white/60 mb-6 border-b border-white/20 pb-4">Katkılarından Dolayı Teşekkür Ederiz</h3>
+              <div className="flex flex-wrap justify-center items-center gap-12 sm:gap-20">
+                <div className="flex flex-col items-center gap-4">
+                  <div className="h-28 w-28 md:h-32 md:w-32 rounded-full overflow-hidden bg-white flex items-center justify-center p-3 shadow-2xl">
+                    <img src="/images/karaman-valiligi-logo.jpg" alt="Karaman Valiliği" className="w-full h-full object-contain" />
+                  </div>
+                  <p className="text-sm md:text-lg font-medium text-white/90">T.C. Karaman Valiliği</p>
+                </div>
+                <div className="flex flex-col items-center gap-4">
+                  <div className="h-28 w-28 md:h-32 md:w-32 rounded-full overflow-hidden bg-white flex items-center justify-center p-3 shadow-2xl">
+                    <img src="/images/ermenek-belediyesi-logo.jpg" alt="Ermenek Belediyesi" className="w-full h-full object-contain" />
+                  </div>
+                  <p className="text-sm md:text-lg font-medium text-white/90">Ermenek Belediyesi</p>
+                </div>
+              </div>
             </div>
 
             <div className="pt-24 max-w-md mx-auto">
