@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Heart, Trophy } from 'lucide-react'
-import { toggleFavorite, toggleTop3 } from '@/app/actions/movies'
+import { Eye, Heart, Trophy } from 'lucide-react'
+import { toggleFavorite, toggleTop3, addMovieWatcher } from '@/app/actions/movies'
 import { useToast } from '@/components/ui/use-toast'
 import { RecommendDialog } from '@/components/recommend-dialog'
 
@@ -24,9 +24,24 @@ export function MovieActions({
 }) {
   const [isFav, setIsFav] = useState(initialFavorite)
   const [isTop, setIsTop] = useState(initialTop3)
+  const [isWatched, setIsWatched] = useState(hasWatched)
   const [loadingFav, setLoadingFav] = useState(false)
   const [loadingTop, setLoadingTop] = useState(false)
+  const [loadingWatched, setLoadingWatched] = useState(false)
   const { toast } = useToast()
+
+  const handleWatched = async () => {
+    setLoadingWatched(true)
+    try {
+      await addMovieWatcher(movieId, 'watched')
+      setIsWatched(true)
+      toast({ title: 'Başarılı', description: 'Film izlendi olarak işaretlendi.' })
+    } catch (err: any) {
+      toast({ variant: 'destructive', title: 'Hata', description: err.message })
+    } finally {
+      setLoadingWatched(false)
+    }
+  }
 
   const handleFav = async () => {
     setLoadingFav(true)
@@ -53,7 +68,20 @@ export function MovieActions({
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-3 mt-4">
+    <div className="flex flex-wrap justify-center sm:justify-start items-center gap-3 mt-4">
+      {!isWatched && (
+        <Button 
+          onClick={handleWatched}
+          disabled={loadingWatched}
+          variant="secondary" 
+          size="lg"
+          className="font-semibold bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-md"
+        >
+          <Eye className="mr-2 h-5 w-5" />
+          İzledim
+        </Button>
+      )}
+
       <Button 
         onClick={handleFav}
         disabled={loadingFav}

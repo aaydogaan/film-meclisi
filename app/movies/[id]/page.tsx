@@ -77,9 +77,9 @@ export default async function MovieDetailsPage({ params }: { params: Promise<{ i
           <div className="absolute inset-0 bg-secondary/10" />
         )}
         
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 pb-12 flex flex-col sm:flex-row gap-6 sm:gap-10 items-start sm:items-end">
+        <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 pb-12 flex flex-col sm:flex-row gap-6 sm:gap-10 items-center sm:items-end">
           {/* Poster */}
-          <div className="w-32 sm:w-64 shrink-0 rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-card hidden sm:block">
+          <div className="w-40 sm:w-64 shrink-0 rounded-xl overflow-hidden shadow-2xl border border-white/10 bg-card mx-auto sm:mx-0 mt-8 sm:mt-0">
             {movie.poster_url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={movie.poster_url} alt={movie.title} className="w-full aspect-[2/3] object-cover" />
@@ -91,12 +91,12 @@ export default async function MovieDetailsPage({ params }: { params: Promise<{ i
           </div>
           
           {/* Title & Info */}
-          <div className="flex-1 w-full pb-4">
+          <div className="flex-1 w-full pb-4 flex flex-col items-center sm:items-start text-center sm:text-left">
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-white mb-4 drop-shadow-xl leading-tight">
               {movie.title}
             </h1>
             
-            <div className="flex flex-wrap items-center gap-3 text-sm sm:text-base text-white/90 font-medium mb-8">
+            <div className="flex flex-wrap justify-center sm:justify-start items-center gap-3 text-sm sm:text-base text-white/90 font-medium mb-8">
               {movie.year && (
                 <span className="text-white font-bold">{movie.year}</span>
               )}
@@ -110,7 +110,7 @@ export default async function MovieDetailsPage({ params }: { params: Promise<{ i
               )}
             </div>
 
-            <div className="flex flex-wrap gap-4 items-center">
+            <div className="flex flex-wrap justify-center sm:justify-start gap-4 items-center">
               <MovieActions 
                 movieId={movieId} 
                 initialFavorite={isFavorite} 
