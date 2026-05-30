@@ -108,7 +108,7 @@ export function MovieActions({
         movieId={movieId} 
         movieTitle={movieTitle} 
         users={users} 
-        hasWatched={hasWatched}
+        hasWatched={isWatched}
       />
     </div>
   )

@@ -192,7 +192,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
         </div>
 
         <div className="rounded-3xl border border-white/5 bg-card/40 backdrop-blur-2xl p-8 shadow-2xl shadow-black/40 ring-1 ring-white/10">
-          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <form onSubmit={handleSubmit} suppressHydrationWarning className="flex flex-col gap-5">
             {isSignUp && (
               <>
                 <div className="flex flex-col gap-3">

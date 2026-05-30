@@ -26,8 +26,10 @@ export default async function HomePage() {
           </p>
         </div>
 
+        <MovieLibrary movies={movies} currentUser={user} />
+
         {activities.length > 0 && (
-          <div className="mb-8 p-4 rounded-xl border border-border bg-card/40 backdrop-blur-sm max-w-3xl">
+          <div className="mt-12 mb-8 p-4 rounded-xl border border-border bg-card/40 backdrop-blur-sm max-w-3xl">
             <h2 className="text-sm font-semibold mb-3 flex items-center gap-2">
               <span className="text-lg">⚡</span> Son İşlemler
             </h2>
@@ -56,8 +58,6 @@ export default async function HomePage() {
             </div>
           </div>
         )}
-
-        <MovieLibrary movies={movies} currentUser={user} />
       </main>
     </div>
   )

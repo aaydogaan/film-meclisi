@@ -35,9 +35,12 @@ type MovieDialogProps = {
 
 type TMDBMovie = {
   id: number
-  title: string
-  release_date: string
+  title?: string
+  name?: string
+  release_date?: string
+  first_air_date?: string
   poster_path: string | null
+  media_type?: 'movie' | 'tv' | 'person'
 }
 
 export function MovieDialog({ open, onOpenChange, movie }: MovieDialogProps) {
@@ -85,14 +88,20 @@ export function MovieDialog({ open, onOpenChange, movie }: MovieDialogProps) {
     
     try {
       const response = await fetch(
-        `https://api.themoviedb.org/3/search/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${encodeURIComponent(searchQuery)}&language=tr-TR`
+        `https://api.themoviedb.org/3/search/multi?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${encodeURIComponent(searchQuery)}&language=tr-TR`
       )
       const data = await response.json()
       
       if (data.results && data.results.length > 0) {
-        setSearchResults(data.results)
+        const filtered = data.results.filter((item: any) => item.media_type === 'movie' || item.media_type === 'tv')
+        if (filtered.length > 0) {
+          setSearchResults(filtered)
+        } else {
+          setError('İçerik bulunamadı')
+          setSearchResults([])
+        }
       } else {
-        setError('Film bulunamadı')
+        setError('İçerik bulunamadı')
         setSearchResults([])
       }
     } catch {
@@ -107,23 +116,33 @@ export function MovieDialog({ open, onOpenChange, movie }: MovieDialogProps) {
     setSearching(true)
     setError(null)
     try {
-      // Önce kütüphanede var mı kontrol et
-      const releaseYear = tmdbMovie.release_date ? Number(tmdbMovie.release_date.substring(0,4)) : null
-      const hasMovie = await checkIfUserHasMovie(tmdbMovie.title, releaseYear)
+      const displayTitle = tmdbMovie.title || tmdbMovie.name || ''
+      const dateStr = tmdbMovie.release_date || tmdbMovie.first_air_date || ''
+      const releaseYear = dateStr ? Number(dateStr.substring(0,4)) : null
+      
+      const hasMovie = await checkIfUserHasMovie(displayTitle, releaseYear)
       if (hasMovie) {
-        setError('Bu film zaten kütüphanenizde bulunuyor.')
+        setError('Bu içerik zaten kütüphanenizde bulunuyor.')
         return
       }
 
-      const response = await fetch(
-        `https://api.themoviedb.org/3/movie/${tmdbMovie.id}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&append_to_response=credits&language=tr-TR`
-      )
+      const endpoint = tmdbMovie.media_type === 'tv' 
+        ? `https://api.themoviedb.org/3/tv/${tmdbMovie.id}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&append_to_response=credits&language=tr-TR`
+        : `https://api.themoviedb.org/3/movie/${tmdbMovie.id}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&append_to_response=credits&language=tr-TR`
+
+      const response = await fetch(endpoint)
       const data = await response.json()
       
-      setTitle(data.title)
-      setYear(data.release_date ? data.release_date.substring(0, 4) : '')
+      setTitle(data.title || data.name || '')
+      const finalDate = data.release_date || data.first_air_date || ''
+      setYear(finalDate ? finalDate.substring(0, 4) : '')
       
-      const directorName = data.credits?.crew?.find((c: any) => c.job === 'Director')?.name || ''
+      let directorName = ''
+      if (tmdbMovie.media_type === 'tv' && data.created_by && data.created_by.length > 0) {
+        directorName = data.created_by[0].name
+      } else {
+        directorName = data.credits?.crew?.find((c: any) => c.job === 'Director' || c.job === 'Executive Producer')?.name || ''
+      }
       setDirector(directorName)
       
       setGenre(data.genres?.[0]?.name || '')
@@ -132,7 +151,7 @@ export function MovieDialog({ open, onOpenChange, movie }: MovieDialogProps) {
       setSearchQuery('')
       setSearchResults([])
     } catch {
-      setError('Detaylar alınamadı veya film zaten ekli')
+      setError('Detaylar alınamadı veya içerik zaten ekli')
     } finally {
       setSearching(false)
     }
@@ -182,7 +201,7 @@ export function MovieDialog({ open, onOpenChange, movie }: MovieDialogProps) {
         <DialogHeader>
           <DialogTitle>{isEdit ? 'Filmi düzenle' : 'Film ekle'}</DialogTitle>
           <DialogDescription>
-            {!isEdit && showSearch ? 'IMDb\'den film ara veya manuel gir.' : 'Film bilgilerini gir.'}
+            {!isEdit && showSearch ? 'Film veya Dizi ara veya manuel gir.' : 'Film bilgilerini gir.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -192,7 +211,7 @@ export function MovieDialog({ open, onOpenChange, movie }: MovieDialogProps) {
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Film adı ara..."
+                placeholder="Film veya Dizi ara..."
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               />
               <Button onClick={handleSearch} disabled={searching}>
@@ -208,7 +227,12 @@ export function MovieDialog({ open, onOpenChange, movie }: MovieDialogProps) {
 
             {searchResults.length > 0 && (
               <div className="flex flex-col gap-2 max-h-60 overflow-y-auto">
-                {searchResults.map((result) => (
+                {searchResults.map((result) => {
+                  const displayTitle = result.title || result.name || ''
+                  const dateStr = result.release_date || result.first_air_date || ''
+                  const yearStr = dateStr ? dateStr.substring(0, 4) : ''
+                  const typeLabel = result.media_type === 'tv' ? 'Dizi' : 'Film'
+                  return (
                   <button
                     key={result.id}
                     type="button"
@@ -219,20 +243,25 @@ export function MovieDialog({ open, onOpenChange, movie }: MovieDialogProps) {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={`https://image.tmdb.org/t/p/w200${result.poster_path}`}
-                        alt={result.title}
+                        alt={displayTitle}
                         className="w-12 h-16 object-cover rounded"
                       />
                     ) : (
-                      <div className="w-12 h-16 bg-secondary rounded flex items-center justify-center text-muted-foreground text-xs">
-                        No poster
+                      <div className="w-12 h-16 bg-secondary rounded flex items-center justify-center text-muted-foreground text-xs text-center">
+                        Kapak yok
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{result.title}</p>
-                      <p className="text-xs text-muted-foreground">{result.release_date ? result.release_date.substring(0, 4) : ''}</p>
+                      <p className="font-medium truncate">{displayTitle}</p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+                        {yearStr && <span>{yearStr}</span>}
+                        {yearStr && <span className="w-1 h-1 rounded-full bg-muted-foreground/50" />}
+                        <span className="font-medium">{typeLabel}</span>
+                      </div>
                     </div>
                   </button>
-                ))}
+                  )
+                })}
               </div>
             )}
 
