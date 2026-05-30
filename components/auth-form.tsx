@@ -101,12 +101,14 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
       
       let messageIndex = 0
       const messageInterval = setInterval(() => {
-        messageIndex = (messageIndex + 1) % FUNNY_MESSAGES.length
-        setFakeLoaderText(FUNNY_MESSAGES[messageIndex])
+        if (messageIndex < FUNNY_MESSAGES.length - 1) {
+          messageIndex++
+          setFakeLoaderText(FUNNY_MESSAGES[messageIndex])
+        }
       }, 1500)
 
-      // Minimum 7.5 saniye bekleme süresi (her mesajı görebilmesi için)
-      const delayPromise = new Promise(resolve => setTimeout(resolve, 7500))
+      // Minimum 9.5 saniye bekleme süresi (son mesajı rahat okuması için)
+      const delayPromise = new Promise(resolve => setTimeout(resolve, 9500))
 
       const signUpPromise = supabase.auth.signUp({
         email,
