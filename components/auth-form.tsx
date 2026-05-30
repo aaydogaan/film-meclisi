@@ -392,7 +392,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
               100% { transform: translateY(-100%); }
             }
             .animate-credits-popup {
-              animation: creditsScrollPopup 40s linear forwards;
+              animation: creditsScrollPopup 25s linear forwards;
             }
           `}</style>
           
