@@ -1,7 +1,8 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { Film, LogOut, Users, Share2, Home, List, BarChart3, Menu, Clock, Trophy, Star } from 'lucide-react'
+import Link from 'next/link'
+import { Film, LogOut, Users, Share2, Home, List, BarChart3, Menu, Clock, Trophy, Star, Bookmark, User } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import {
@@ -116,24 +117,6 @@ export function AppHeader({ name, email, avatarUrl }: { name: string; email: str
                 </span>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href={`/users/${userId || ''}`}>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profilim</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/watchlist">
-                  <Bookmark className="mr-2 h-4 w-4" />
-                  <span>İzlenecekler ({watchlistCount})</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/recommendations">
-                  <Share2 className="mr-2 h-4 w-4" />
-                  <span>Gelen Öneriler ({unreadCount})</span>
-                </Link>
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={handleSignOut}>
                 <LogOut className="mr-2 h-4 w-4" />
