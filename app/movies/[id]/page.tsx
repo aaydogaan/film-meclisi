@@ -57,6 +57,31 @@ export default async function MovieDetailsPage({ params }: { params: Promise<{ i
   
   const defaultName = user.user_metadata?.name ?? user.email?.split('@')[0] ?? 'Anonim'
 
+  // Calculate Community Rating
+  const validRatings = watchers.filter((w: any) => typeof w.rating === 'number' && w.rating > 0)
+  const averageRating = validRatings.length > 0 
+    ? (validRatings.reduce((sum: number, w: any) => sum + w.rating, 0) / validRatings.length).toFixed(1)
+    : null
+
+  // Fetch TMDB/IMDb Rating
+  let imdbRating = null
+  try {
+    const res = await fetch(`https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(movie.title)}&language=tr-TR&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`)
+    if (res.ok) {
+      const data = await res.json()
+      if (data.results && data.results.length > 0) {
+        let bestMatch = data.results[0]
+        if (movie.year) {
+          const yearMatch = data.results.find((r: any) => (r.release_date || r.first_air_date || '').startsWith(movie.year.toString()))
+          if (yearMatch) bestMatch = yearMatch
+        }
+        if (bestMatch.vote_average && bestMatch.vote_average > 0) {
+          imdbRating = bestMatch.vote_average.toFixed(1)
+        }
+      }
+    }
+  } catch(e) {}
+
   return (
     <div className="min-h-svh bg-gradient-to-b from-background to-muted/20 pb-12">
       <AppHeader name={user.user_metadata?.name ?? user.email ?? ''} email={user.email ?? ''} avatarUrl={user.user_metadata?.avatar_url} />
@@ -108,6 +133,17 @@ export default async function MovieDetailsPage({ params }: { params: Promise<{ i
               {movie.director && (
                 <span className="text-white/80"><span className="opacity-70">Yönetmen:</span> {movie.director}</span>
               )}
+            </div>
+            
+            <div className="flex items-center justify-center sm:justify-start gap-4 mb-8 text-white">
+              <div className="flex flex-col items-center p-3 bg-white/10 rounded-xl backdrop-blur-md min-w-[100px]">
+                <span className="text-xs text-white/70 uppercase tracking-widest font-semibold mb-1">IMDB Puanı</span>
+                <span className="text-2xl font-bold text-yellow-400">{imdbRating || '?'}</span>
+              </div>
+              <div className="flex flex-col items-center p-3 bg-white/10 rounded-xl backdrop-blur-md min-w-[100px]">
+                <span className="text-xs text-white/70 uppercase tracking-widest font-semibold mb-1">Meclis Puanı</span>
+                <span className="text-2xl font-bold text-emerald-400">{averageRating || '?'}</span>
+              </div>
             </div>
 
             <div className="flex flex-wrap justify-center sm:justify-start gap-4 items-center">

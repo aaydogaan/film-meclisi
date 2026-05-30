@@ -67,11 +67,19 @@ export function MovieCard({ movie, onEdit, currentUser }: MovieCardProps) {
 
   useEffect(() => {
     if (movie.title) {
-      const yearStr = movie.year ? `&y=${movie.year}` : ''
-      fetch(`https://www.omdbapi.com/?t=${encodeURIComponent(movie.title)}${yearStr}&apikey=${process.env.NEXT_PUBLIC_OMDB_API_KEY || 'efbf9335'}`)
+      fetch(`https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(movie.title)}&language=tr-TR&api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}`)
         .then(res => res.json())
         .then(data => {
-          if (data.imdbRating && data.imdbRating !== 'N/A') setImdbRating(data.imdbRating)
+          if (data.results && data.results.length > 0) {
+             let bestMatch = data.results[0]
+             if (movie.year) {
+               const yearMatch = data.results.find((r: any) => (r.release_date || r.first_air_date || '').startsWith(movie.year.toString()))
+               if (yearMatch) bestMatch = yearMatch
+             }
+             if (bestMatch.vote_average && bestMatch.vote_average > 0) {
+               setImdbRating(bestMatch.vote_average.toFixed(1))
+             }
+          }
         })
         .catch(() => {})
     }
