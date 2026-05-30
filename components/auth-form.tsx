@@ -389,14 +389,14 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
           <style>{`
             @keyframes creditsScrollPopup {
               0% { transform: translateY(100vh); }
-              100% { transform: translateY(-100%); }
+              100% { transform: translateY(-150%); }
             }
             .animate-credits-popup {
-              animation: creditsScrollPopup 25s linear forwards;
+              animation: creditsScrollPopup 30s linear forwards;
             }
           `}</style>
           
-          <div className="animate-credits-popup flex flex-col items-center text-center space-y-16 text-white w-full max-w-2xl px-4 absolute top-0 pb-32">
+          <div className="animate-credits-popup flex flex-col items-center text-center space-y-16 text-white w-full max-w-2xl px-4 absolute top-0 pb-48">
             <div className="space-y-4 mb-8">
               <img 
                 src="/images/film-meclisi-logo.png" 
