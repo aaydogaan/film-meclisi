@@ -63,6 +63,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
   const [loading, setLoading] = useState(false)
   const [showFakeLoader, setShowFakeLoader] = useState(false)
   const [fakeLoaderText, setFakeLoaderText] = useState('')
+  const [showCredits, setShowCredits] = useState(false)
   const [selectedAvatar, setSelectedAvatar] = useState<AvatarOption>(AVATAR_OPTIONS[0])
   const carouselRef = useRef<HTMLDivElement>(null)
 
@@ -165,34 +166,15 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
         </div>
       )}
 
-      {/* Developer Info (Movie Credits Style) */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden flex justify-center z-0 opacity-[0.15]">
-        <style>{`
-          @keyframes creditsScroll {
-            0% { transform: translateY(100vh); }
-            100% { transform: translateY(-100%); }
-          }
-          .animate-credits {
-            animation: creditsScroll 20s linear infinite;
-          }
-        `}</style>
-        <div className="animate-credits flex flex-col items-center text-center space-y-12 text-foreground w-full max-w-lg mt-[50vh]">
-          <div className="space-y-2">
-            <h2 className="text-xl md:text-2xl font-bold tracking-widest uppercase">Geliştirici Notları</h2>
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-sm md:text-base uppercase tracking-widest text-foreground/70">Fikir & Kod Yazan vs.</h3>
-            <p className="text-lg md:text-xl font-semibold">Recep Aydoğan</p>
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-sm md:text-base uppercase tracking-widest text-foreground/70">Revize, Öneri</h3>
-            <p className="text-lg md:text-xl font-semibold">Yahya Veysel Aydoğan<br/>Selman Aydoğan</p>
-          </div>
-          <div className="space-y-1">
-            <h3 className="text-sm md:text-base uppercase tracking-widest text-foreground/70">Kayıt Olanlar</h3>
-            <p className="text-lg md:text-xl font-semibold">Recep Aydoğan<br/>Yahya Veysel Aydoğan<br/>Selman Aydoğan<br/>Emre</p>
-          </div>
-        </div>
+      {/* Developer Info Button */}
+      <div className="absolute bottom-4 text-center w-full z-20">
+        <button 
+          type="button" 
+          onClick={() => setShowCredits(true)}
+          className="text-sm font-medium text-muted-foreground/60 hover:text-primary transition-colors tracking-wide underline-offset-4 hover:underline"
+        >
+          Geliştiriciler
+        </button>
       </div>
 
       {/* Decorative background glow */}
@@ -392,6 +374,71 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
           </div>
         )}
       </div>
+
+      {/* Credits Modal */}
+      {showCredits && (
+        <div className="fixed inset-0 z-[200] bg-black overflow-hidden flex flex-col items-center">
+          <button 
+            onClick={() => setShowCredits(false)} 
+            className="absolute top-6 right-6 text-white/50 hover:text-white z-[210] p-2 transition-colors"
+            title="Kapat"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+          
+          <style>{`
+            @keyframes creditsScrollPopup {
+              0% { transform: translateY(100vh); }
+              100% { transform: translateY(-100%); }
+            }
+            .animate-credits-popup {
+              animation: creditsScrollPopup 30s linear forwards;
+            }
+          `}</style>
+          
+          <div className="animate-credits-popup flex flex-col items-center text-center space-y-16 text-white w-full max-w-2xl px-4 absolute top-0 pb-32">
+            <div className="space-y-4 mb-8">
+              <h2 className="text-3xl md:text-5xl font-bold tracking-widest uppercase">Film Meclisi</h2>
+            </div>
+            
+            <div className="space-y-2">
+              <h3 className="text-sm md:text-lg uppercase tracking-widest text-white/60">Fikir & Kod Yazan vs.</h3>
+              <p className="text-xl md:text-3xl font-semibold">Recep Aydoğan</p>
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-sm md:text-lg uppercase tracking-widest text-white/60">Revize & Öneri</h3>
+              <p className="text-xl md:text-3xl font-semibold">Yahya Veysel Aydoğan<br/>Selman Aydoğan</p>
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-sm md:text-lg uppercase tracking-widest text-white/60">Dublörler (Kayıt Olanlar)</h3>
+              <p className="text-xl md:text-3xl font-semibold leading-relaxed">Recep Aydoğan<br/>Yahya Veysel Aydoğan<br/>Selman Aydoğan<br/>Emre</p>
+            </div>
+
+            <div className="space-y-2 pt-8">
+              <h3 className="text-sm md:text-lg uppercase tracking-widest text-white/60">Görüntü Yönetmeni</h3>
+              <p className="text-xl md:text-3xl font-semibold">Tailwind CSS & Vercel</p>
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-sm md:text-lg uppercase tracking-widest text-white/60">Catering (Sette Yemek)</h3>
+              <p className="text-xl md:text-3xl font-semibold">Sınırsız Filtre Kahve ☕</p>
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-sm md:text-lg uppercase tracking-widest text-white/60">Özel Teşekkürler</h3>
+              <p className="text-xl md:text-3xl font-semibold">Uykusuz Geceler</p>
+            </div>
+
+            <div className="pt-24 max-w-md mx-auto">
+              <p className="text-sm md:text-lg italic text-white/40 leading-relaxed">
+                "Bu projenin yapım aşamasında hiçbir bilgisayara zarar verilmemiştir." 🦖
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   )
 }
