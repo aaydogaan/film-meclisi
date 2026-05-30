@@ -201,8 +201,18 @@ export function MovieCard({ movie, onEdit, currentUser }: MovieCardProps) {
   const handleMarkAsWatched = () => {
     startTransition(() => {
       addMovieWatcher(movie.id, 'watched', rating || undefined)
+      if (comment.trim() && !hasCommented) {
+        const defaultName = currentUser?.user_metadata?.name || currentUser?.email?.split('@')[0] || 'İsimsiz'
+        addMovieComment(movie.id, comment, defaultName).then(() => {
+          if (commentsDialogOpen) {
+            getMovieComments(movie.id).then(setComments)
+          }
+          setHasCommented(true)
+        })
+      }
       setWatcherDialogOpen(false)
       setRating(0)
+      setComment('')
     })
   }
 
@@ -397,7 +407,7 @@ export function MovieCard({ movie, onEdit, currentUser }: MovieCardProps) {
               <span className="truncate">Yorumları Gör</span>
             </Button>
           ) : (
-            <div className={`grid gap-2 ${!hasCommented ? 'grid-cols-2' : 'grid-cols-1'}`}>
+            <div className={`grid gap-2 ${!hasCommented && watchStatus === 'watched' ? 'grid-cols-2' : 'grid-cols-1'}`}>
               <Button
                 size="sm"
                 variant="outline"
@@ -408,7 +418,7 @@ export function MovieCard({ movie, onEdit, currentUser }: MovieCardProps) {
                 <span className="truncate text-[10px] sm:text-xs">Puanla</span>
               </Button>
               
-              {!hasCommented && (
+              {!hasCommented && watchStatus === 'watched' && (
                 <Button
                   size="sm"
                   variant="outline"
@@ -455,25 +465,40 @@ export function MovieCard({ movie, onEdit, currentUser }: MovieCardProps) {
                 <p className="text-sm font-medium">Bu filme zaten <strong>{initialRating}</strong> puan verdiniz.</p>
                 <p className="text-xs text-muted-foreground mt-1">Puanlar sonradan değiştirilemez.</p>
               </div>
+            ) : watchStatus !== 'watched' ? (
+              <div className="flex flex-col items-center gap-4 py-4 text-center">
+                <p className="text-lg">Bu <strong>{movie.title}</strong> filmini izledin mi?</p>
+                <div className="flex gap-4 w-full justify-center mt-2">
+                  <Button 
+                    onClick={() => {
+                      setWatchStatus('watched')
+                    }} 
+                    className="flex-1"
+                  >
+                    Evet, İzledim
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      handleMarkAsWantToWatch()
+                    }} 
+                    variant="outline" 
+                    className="flex-1"
+                  >
+                    Hayır, İzleyeceğim
+                  </Button>
+                </div>
+              </div>
             ) : (
               <>
-                <Button onClick={handleMarkAsWatched} className="w-full">
-                  <Eye className="h-4 w-4 mr-2" />
-                  İzledim
-                </Button>
-                <Button onClick={handleMarkAsWantToWatch} variant="outline" className="w-full">
-                  <EyeOff className="h-4 w-4 mr-2" />
-                  İzleyeceğim
-                </Button>
                 <div className="flex flex-col gap-2">
-                  <Label>Puan (1-10) (isteğe bağlı)</Label>
-                  <div className="flex flex-wrap gap-1.5 justify-between">
+                  <Label className="text-center mb-2">Bu filme kaç puan verirsin? (1-10)</Label>
+                  <div className="flex flex-wrap gap-1.5 justify-center">
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
                       <button
                         key={num}
                         type="button"
                         onClick={() => setRating(num)}
-                        className={`h-8 w-8 rounded-lg text-xs font-bold transition-all border ${
+                        className={`h-10 w-10 sm:h-12 sm:w-12 rounded-lg text-sm font-bold transition-all border ${
                           rating === num
                             ? 'bg-primary text-primary-foreground border-primary shadow-sm scale-110'
                             : 'bg-secondary/50 text-muted-foreground border-border hover:bg-secondary hover:text-foreground'
@@ -483,6 +508,19 @@ export function MovieCard({ movie, onEdit, currentUser }: MovieCardProps) {
                       </button>
                     ))}
                   </div>
+                  
+                  {!hasCommented && (
+                    <div className="mt-4 flex flex-col gap-2 text-left">
+                      <Label className="text-sm">Yorumunuz (isteğe bağlı)</Label>
+                      <Textarea
+                        placeholder="Film hakkında ne düşünüyorsunuz?"
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        className="resize-none text-sm"
+                        rows={3}
+                      />
+                    </div>
+                  )}
                 </div>
               </>
             )}
@@ -491,8 +529,10 @@ export function MovieCard({ movie, onEdit, currentUser }: MovieCardProps) {
             <Button variant="outline" onClick={() => setWatcherDialogOpen(false)}>
               Kapat
             </Button>
-            {initialRating === 0 && (
-              <Button onClick={handleMarkAsWatched}>Kaydet</Button>
+            {initialRating === 0 && watchStatus === 'watched' && (
+              <Button onClick={handleMarkAsWatched} disabled={!rating}>
+                Puanı Kaydet
+              </Button>
             )}
           </DialogFooter>
         </DialogContent>
