@@ -89,11 +89,11 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
 
     if (isSignUp) {
       const FUNNY_MESSAGES = [
-        "Sunuculara fısıldanıyor...",
         "Sizin için en iyi koltuk ayrılıyor...",
-        "Kablolar birbirine bağlanıyor...",
+        "Gişede biletiniz kesiliyor...",
         "Kodlar derleniyor, az kaldı...",
-        "Kayıt olmanız aslında bu kadar uzun sürmüyor ama Recep böyle istedi :)"
+        "Film Meclisi'nin kırmızı halısı seriliyor...",
+        "Kayıt olmanız aslında bu kadar uzun sürmüyor ama Recep Bey böyle istedi :)"
       ]
       
       setShowFakeLoader(true)
@@ -165,9 +165,34 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
         </div>
       )}
 
-      {/* Developer Info */}
-      <div className="absolute bottom-4 text-sm font-medium text-muted-foreground/60 tracking-wide text-center w-full pointer-events-none">
-        Geliştirici <span className="text-foreground/70">Recep Aydoğan</span>
+      {/* Developer Info (Movie Credits Style) */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden flex justify-center z-0 opacity-[0.15]">
+        <style>{`
+          @keyframes creditsScroll {
+            0% { transform: translateY(100vh); }
+            100% { transform: translateY(-100%); }
+          }
+          .animate-credits {
+            animation: creditsScroll 20s linear infinite;
+          }
+        `}</style>
+        <div className="animate-credits flex flex-col items-center text-center space-y-12 text-foreground w-full max-w-lg mt-[50vh]">
+          <div className="space-y-2">
+            <h2 className="text-xl md:text-2xl font-bold tracking-widest uppercase">Geliştirici Notları</h2>
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-sm md:text-base uppercase tracking-widest text-foreground/70">Fikir & Kod Yazan vs.</h3>
+            <p className="text-lg md:text-xl font-semibold">Recep Aydoğan</p>
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-sm md:text-base uppercase tracking-widest text-foreground/70">Revize, Öneri</h3>
+            <p className="text-lg md:text-xl font-semibold">Yahya Veysel Aydoğan<br/>Selman Aydoğan</p>
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-sm md:text-base uppercase tracking-widest text-foreground/70">Kayıt Olanlar</h3>
+            <p className="text-lg md:text-xl font-semibold">Recep Aydoğan<br/>Yahya Veysel Aydoğan<br/>Selman Aydoğan<br/>Emre</p>
+          </div>
+        </div>
       </div>
 
       {/* Decorative background glow */}
