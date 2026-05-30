@@ -179,7 +179,7 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
           <img 
             src="/images/film-meclisi-logo.png" 
             alt="Film Meclisi Logo" 
-            className="h-16 sm:h-24 w-auto object-contain mb-6 drop-shadow-2xl"
+            className="h-20 sm:h-32 w-auto object-contain mb-6 drop-shadow-2xl"
           />
           <h1 className="text-2xl font-semibold tracking-tight text-foreground text-balance">
             {isSignUp ? "Film Meclisi'ne katıl" : 'Tekrar hoş geldin'}
