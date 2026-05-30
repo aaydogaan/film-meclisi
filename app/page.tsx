@@ -17,15 +17,6 @@ export default async function HomePage() {
     <div className="min-h-svh bg-gradient-to-b from-background to-muted/20">
       <AppHeader name={user.user_metadata?.name ?? user.email ?? ''} email={user.email ?? ''} avatarUrl={user.user_metadata?.avatar_url} />
       <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-            Merhaba, {(user.user_metadata?.name ?? user.email ?? '').split(' ')[0]}
-          </h1>
-          <p className="mt-2 text-muted-foreground">
-            İzlediğin filmleri kaydet, puanla ve hakkında not al.
-          </p>
-        </div>
-
         <MovieLibrary movies={movies} currentUser={user} />
 
         {activities.length > 0 && (

@@ -64,6 +64,12 @@ export function MovieCard({ movie, onEdit, currentUser }: MovieCardProps) {
   const [watchStatus, setWatchStatus] = useState<string>('')
   const { toast } = useToast()
 
+  const validRatings = movie.movie_watchers?.filter((w: any) => typeof w.rating === 'number' && w.rating > 0) || []
+  const averageRating = validRatings.length > 0 
+    ? (validRatings.reduce((sum: number, w: any) => sum + w.rating, 0) / validRatings.length).toFixed(1)
+    : null
+  const totalComments = movie.movie_comments?.length || 0
+
   useEffect(() => {
     if (currentUser) {
       let foundComment = false
@@ -243,6 +249,11 @@ export function MovieCard({ movie, onEdit, currentUser }: MovieCardProps) {
       )}
     >
       <Link href={`/movies/${movie.id}`} className="relative aspect-[2/3] w-full overflow-hidden bg-secondary block">
+        {watchStatus !== 'watched' && (
+          <div className="absolute top-2 left-2 z-10 bg-black/60 backdrop-blur-md px-2 py-1 rounded text-[10px] font-semibold text-white/90 uppercase tracking-wide border border-white/10 shadow-sm">
+            İzlenmedi
+          </div>
+        )}
         {movie.poster_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -326,15 +337,30 @@ export function MovieCard({ movie, onEdit, currentUser }: MovieCardProps) {
           </Badge>
         )}
 
-        <div className="mt-4 mb-2 text-xs font-medium px-1 flex items-center justify-between border-t pt-2 border-border/50">
-          <span className="text-muted-foreground flex items-center gap-1.5">
-            <Star className={`h-3.5 w-3.5 ${initialRating > 0 ? 'fill-yellow-500 text-yellow-500' : 'text-muted-foreground/50'}`} />
-            {initialRating > 0 ? (
-              <span className="text-foreground">Puanınız: <span className="font-bold text-yellow-500">{initialRating}/10</span></span>
-            ) : (
-              'Henüz puan verilmedi'
-            )}
-          </span>
+        <div className="mt-auto pt-2 pb-1">
+          {averageRating ? (
+            <div className="flex items-center justify-between px-1 text-xs text-muted-foreground border-t pt-2 border-border/50">
+              <span className="flex items-center gap-1 font-medium" title="Film Meclisi Puanı">
+                <Star className="h-3.5 w-3.5 fill-yellow-500 text-yellow-500" />
+                <span className="text-foreground font-bold text-yellow-500">{averageRating}</span> 
+                <span className="text-[10px]">/ 10</span>
+              </span>
+              <span className="flex items-center gap-1" title="Toplam Yorum">
+                <MessageSquare className="h-3.5 w-3.5" />
+                {totalComments} Yorum
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between px-1 text-[10px] text-muted-foreground/70 uppercase tracking-wide font-medium border-t pt-2 border-border/50">
+              <span>Henüz Puanlanmadı</span>
+              {totalComments > 0 && (
+                <span className="flex items-center gap-1 normal-case tracking-normal text-xs text-muted-foreground">
+                  <MessageSquare className="h-3.5 w-3.5" />
+                  {totalComments}
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         <div className={`grid gap-2 mt-auto ${hasCommented || initialRating > 0 ? 'grid-cols-1' : 'grid-cols-2'}`}>
