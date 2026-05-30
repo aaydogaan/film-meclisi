@@ -137,11 +137,6 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
         setLoading(false)
         return
       }
-
-      if (data?.user) {
-        const avatarUrl = `https://api.dicebear.com/9.x/${selectedAvatar.style}/svg?seed=${selectedAvatar.seed}&backgroundColor=b6e3f4,c0aede,d1d4f9`
-        await supabase.from('profiles').update({ avatar_url: avatarUrl }).eq('id', data.user.id)
-      }
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) {
