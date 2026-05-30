@@ -353,7 +353,7 @@ export async function getAllUsers() {
   if (error) throw new Error(error.message)
   return (data ?? []).map((user: any) => ({
     ...user,
-    avatar_url: `https://api.dicebear.com/9.x/avataaars/svg?seed=${encodeURIComponent(user.name || user.email)}&backgroundColor=b6e3f4,c0aede,d1d4f9`
+    avatar_url: user.avatar_url || `https://api.dicebear.com/9.x/avataaars/svg?seed=${encodeURIComponent(user.name || user.email)}&backgroundColor=b6e3f4,c0aede,d1d4f9`
   }))
 }
 
@@ -368,7 +368,7 @@ export async function getUserById(userId: string) {
   if (error) throw new Error(error.message)
   return {
     ...data,
-    avatar_url: `https://api.dicebear.com/9.x/avataaars/svg?seed=${encodeURIComponent(data.name || data.email)}&backgroundColor=b6e3f4,c0aede,d1d4f9`
+    avatar_url: data.avatar_url || `https://api.dicebear.com/9.x/avataaars/svg?seed=${encodeURIComponent(data.name || data.email)}&backgroundColor=b6e3f4,c0aede,d1d4f9`
   }
 }
 
@@ -850,7 +850,8 @@ export async function addMovieWithStatus(
   input: MovieInput,
   status: 'watched' | 'want_to_watch',
   rating?: number,
-  comment?: string
+  comment?: string,
+  addToWatchlist?: boolean
 ) {
   const userId = await getUserId()
   const title = input.title?.trim()
@@ -923,6 +924,15 @@ export async function addMovieWithStatus(
     })
     if (commentError) {
       console.error('Yorum kaydedilemedi:', commentError.message)
+    }
+  }
+
+  if (addToWatchlist) {
+    try {
+      const watchlist = await getOrCreateWatchlist(userId)
+      await addMovieToList(watchlist.id, movieId)
+    } catch (err) {
+      console.error('Watchlist addition failed:', err)
     }
   }
 

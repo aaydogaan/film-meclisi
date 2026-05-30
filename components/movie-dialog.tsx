@@ -59,8 +59,9 @@ export function MovieDialog({ open, onOpenChange, movie }: MovieDialogProps) {
   const [searching, setSearching] = useState(false)
   const [showSearch, setShowSearch] = useState(!isEdit)
   const [status, setStatus] = useState<'watched' | 'want_to_watch'>('watched')
-  const [rating, setRating] = useState<number>(7)
+  const [rating, setRating] = useState<number>(0)
   const [comment, setComment] = useState('')
+  const [addToWatchlist, setAddToWatchlist] = useState(false)
 
   const [syncedId, setSyncedId] = useState<number | 'new' | null>(null)
   const currentKey = movie?.id ?? 'new'
@@ -182,7 +183,8 @@ export function MovieDialog({ open, onOpenChange, movie }: MovieDialogProps) {
           payload,
           status,
           status === 'watched' ? rating : undefined,
-          status === 'watched' ? comment.trim() || undefined : undefined
+          status === 'watched' ? comment.trim() || undefined : undefined,
+          addToWatchlist
         )
       }
 
@@ -373,6 +375,19 @@ export function MovieDialog({ open, onOpenChange, movie }: MovieDialogProps) {
                       İzleyeceğim
                     </Button>
                   </div>
+                </div>
+
+                <div className="flex items-center space-x-2 pt-2 pb-2">
+                  <input 
+                    type="checkbox" 
+                    id="addToWatchlist" 
+                    checked={addToWatchlist} 
+                    onChange={(e) => setAddToWatchlist(e.target.checked)} 
+                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                  />
+                  <Label htmlFor="addToWatchlist" className="text-sm font-medium leading-none cursor-pointer">
+                    İlk İzlenecekler (Watchlist) listeme ekle
+                  </Label>
                 </div>
 
                 {status === 'watched' && (
