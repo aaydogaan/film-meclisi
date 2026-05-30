@@ -61,6 +61,8 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [showFakeLoader, setShowFakeLoader] = useState(false)
+  const [fakeLoaderText, setFakeLoaderText] = useState('')
   const [selectedAvatar, setSelectedAvatar] = useState<AvatarOption>(AVATAR_OPTIONS[0])
   const carouselRef = useRef<HTMLDivElement>(null)
 
@@ -86,7 +88,27 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
     const supabase = createClient()
 
     if (isSignUp) {
-      const { error } = await supabase.auth.signUp({
+      const FUNNY_MESSAGES = [
+        "Sunuculara fısıldanıyor...",
+        "Sizin için en iyi koltuk ayrılıyor...",
+        "Kablolar birbirine bağlanıyor...",
+        "Kodlar derleniyor, az kaldı...",
+        "Kayıt olmanız aslında bu kadar uzun sürmüyor ama Recep böyle istedi :)"
+      ]
+      
+      setShowFakeLoader(true)
+      setFakeLoaderText(FUNNY_MESSAGES[0])
+      
+      let messageIndex = 0
+      const messageInterval = setInterval(() => {
+        messageIndex = (messageIndex + 1) % FUNNY_MESSAGES.length
+        setFakeLoaderText(FUNNY_MESSAGES[messageIndex])
+      }, 1500)
+
+      // Minimum 7.5 saniye bekleme süresi (her mesajı görebilmesi için)
+      const delayPromise = new Promise(resolve => setTimeout(resolve, 7500))
+
+      const signUpPromise = supabase.auth.signUp({
         email,
         password,
         options: {
@@ -97,6 +119,13 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
           emailRedirectTo: `${window.location.origin}/sign-in`,
         },
       })
+
+      const [, response] = await Promise.all([delayPromise, signUpPromise])
+      
+      clearInterval(messageInterval)
+      setShowFakeLoader(false)
+
+      const { error } = response
       if (error) {
         setError(
           error.message === 'User already registered'
@@ -125,6 +154,15 @@ export function AuthForm({ mode }: { mode: 'sign-in' | 'sign-up' }) {
 
   return (
     <main className="min-h-svh bg-gradient-to-br from-background via-background to-secondary/30 flex items-center justify-center px-4 py-10 relative overflow-hidden">
+      {showFakeLoader && (
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/90 backdrop-blur-md animate-in fade-in duration-500">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-8" />
+          <p className="text-xl md:text-2xl font-medium text-center animate-pulse px-4 max-w-md text-foreground">
+            {fakeLoaderText}
+          </p>
+        </div>
+      )}
+
       {/* Decorative background glow */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px] -z-10 pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 rounded-full blur-[120px] -z-10 pointer-events-none" />
