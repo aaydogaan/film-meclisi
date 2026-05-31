@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { getAllUsers, getUserStats } from '@/app/actions/movies'
+import { getAllUsers, getAllUserStats } from '@/app/actions/movies'
 import { AppHeader } from '@/components/app-header'
 
 export default async function UsersPage() {
@@ -11,15 +11,13 @@ export default async function UsersPage() {
 
   const users = await getAllUsers()
   
-  const usersWithStats = await Promise.all(
-    users.map(async (u) => {
-      const stats = await getUserStats(u.id)
-      return {
-        ...u,
-        stats,
-      }
-    })
-  )
+  const userIds = users.map(u => u.id)
+  const statsMap = await getAllUserStats(userIds)
+  
+  const usersWithStats = users.map(u => ({
+    ...u,
+    stats: statsMap.get(u.id) || { watchedCount: 0, commentCount: 0 }
+  }))
 
   // Giriş yapmış kullanıcıyı listenin en başına alıyoruz
   const sortedUsersWithStats = [...usersWithStats].sort((a, b) => {

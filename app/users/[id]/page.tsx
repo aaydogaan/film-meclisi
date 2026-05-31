@@ -116,8 +116,8 @@ export default async function UserProfilePage({ params }: { params: Promise<{ id
                             : 'bg-secondary/30 border-border/50 text-muted-foreground/50 grayscale hover:grayscale-0'
                         }`} 
                       >
-                        <span className={`text-lg ${!badge.is_earned ? 'opacity-50' : ''}`}>{badge.icon}</span>
-                        <span className={`font-semibold text-sm ${!badge.is_earned ? 'opacity-70' : ''}`}>{badge.name}</span>
+                        <span suppressHydrationWarning className={`text-lg ${!badge.is_earned ? 'opacity-50' : ''}`}>{badge.icon}</span>
+                        <span suppressHydrationWarning className={`font-semibold text-sm ${!badge.is_earned ? 'opacity-70' : ''}`}>{badge.name}</span>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent side="top" className="bg-popover text-popover-foreground border shadow-md font-medium">

@@ -14,7 +14,7 @@ import {
 import { MovieCard } from '@/components/movie-card'
 import { MovieDialog } from '@/components/movie-dialog'
 
-export function MovieLibrary({ movies, currentUser, allUsers }: { movies: any[]; currentUser: any; allUsers?: any[] }) {
+export function MovieLibrary({ movies, currentUser }: { movies: any[]; currentUser: any }) {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<any | null>(null)
   const [search, setSearch] = useState('')
@@ -39,10 +39,6 @@ export function MovieLibrary({ movies, currentUser, allUsers }: { movies: any[];
         } else if (statusFilter === 'unwatched') {
           const watcher = m.movie_watchers?.find((w: any) => w.user_id === currentUser.id)
           if (watcher && watcher.status === 'watched') return false 
-        } else if (statusFilter.startsWith('user_')) {
-          const uId = statusFilter.split('_')[1]
-          const watcher = m.movie_watchers?.find((w: any) => w.user_id === uId)
-          if (!watcher || watcher.status !== 'watched') return false
         }
       }
 
@@ -78,7 +74,7 @@ export function MovieLibrary({ movies, currentUser, allUsers }: { movies: any[];
           </Button>
         </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="flex flex-row gap-3">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -89,7 +85,7 @@ export function MovieLibrary({ movies, currentUser, allUsers }: { movies: any[];
             />
           </div>
           <Select value={genre} onValueChange={setGenre}>
-            <SelectTrigger className="sm:w-32">
+            <SelectTrigger className="w-32">
               <SelectValue placeholder="Tür" />
             </SelectTrigger>
             <SelectContent>
@@ -103,23 +99,13 @@ export function MovieLibrary({ movies, currentUser, allUsers }: { movies: any[];
           </Select>
 
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="sm:w-48">
+            <SelectTrigger className="w-48">
               <SelectValue placeholder="Durum" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tüm Durumlar</SelectItem>
               <SelectItem value="watched">İzlediklerim</SelectItem>
               <SelectItem value="unwatched">İzlenmeyenler</SelectItem>
-              {allUsers && allUsers.length > 0 && (
-                <div className="pt-2 mt-2 border-t border-border/50">
-                  <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">Üyelere Göre:</div>
-                  {allUsers.filter(u => u.id !== currentUser.id).map((u: any) => (
-                    <SelectItem key={`user_${u.id}`} value={`user_${u.id}`}>
-                      {u.name || u.email.split('@')[0]} (İzledikleri)
-                    </SelectItem>
-                  ))}
-                </div>
-              )}
             </SelectContent>
           </Select>
         </div>

@@ -1,7 +1,6 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { revalidatePath } from 'next/cache'
 
 export type MovieInput = {
@@ -345,6 +344,44 @@ export async function getUserStats(userId: string) {
   }
 }
 
+export async function getAllUserStats(userIds: string[]) {
+  const supabase = await createClient()
+  
+  const [{ data: watchedMovies }, { data: userComments }] = await Promise.all([
+    supabase
+      .from('movie_watchers')
+      .select('user_id')
+      .eq('status', 'watched')
+      .in('user_id', userIds),
+    supabase
+      .from('movie_comments')
+      .select('user_id')
+      .in('user_id', userIds)
+  ])
+
+  const statsMap = new Map<string, { watchedCount: number; commentCount: number }>()
+  
+  userIds.forEach(id => {
+    statsMap.set(id, { watchedCount: 0, commentCount: 0 })
+  })
+  
+  watchedMovies?.forEach((w: any) => {
+    const stats = statsMap.get(w.user_id)
+    if (stats) {
+      stats.watchedCount++
+    }
+  })
+  
+  userComments?.forEach((c: any) => {
+    const stats = statsMap.get(c.user_id)
+    if (stats) {
+      stats.commentCount++
+    }
+  })
+  
+  return statsMap
+}
+
 export async function getAllUsers() {
   const supabase = await createClient()
   const { data: profiles, error } = await supabase
@@ -353,29 +390,11 @@ export async function getAllUsers() {
   
   if (error) throw new Error(error.message)
   
-  let authUsers: any[] = []
-  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    try {
-      const supabaseAdmin = createSupabaseClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY
-      )
-      const { data } = await supabaseAdmin.auth.admin.listUsers()
-      authUsers = data?.users || []
-    } catch (err) {
-      console.error('Could not fetch auth users for avatars', err)
-    }
-  }
-
-  return (profiles ?? []).map((profile: any) => {
-    const authUser = authUsers.find(u => u.id === profile.id)
-    const avatar = authUser?.user_metadata?.avatar_url || 
+  return (profiles ?? []).map((profile: any) => ({
+    ...profile,
+    avatar_url: profile.avatar_url || 
       `https://api.dicebear.com/9.x/avataaars/svg?seed=${encodeURIComponent(profile.name || profile.email)}&backgroundColor=b6e3f4,c0aede,d1d4f9`
-    return {
-      ...profile,
-      avatar_url: avatar
-    }
-  })
+  }))
 }
 
 export async function getUserById(userId: string) {
@@ -388,26 +407,10 @@ export async function getUserById(userId: string) {
   
   if (error) throw new Error(error.message)
     
-  let avatar = `https://api.dicebear.com/9.x/avataaars/svg?seed=${encodeURIComponent(profile.name || profile.email)}&backgroundColor=b6e3f4,c0aede,d1d4f9`
-  
-  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    try {
-      const supabaseAdmin = createSupabaseClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY
-      )
-      const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId)
-      if (authUser?.user?.user_metadata?.avatar_url) {
-        avatar = authUser.user.user_metadata.avatar_url
-      }
-    } catch (err) {
-      console.error('Could not fetch auth user for avatar', err)
-    }
-  }
-
   return {
     ...profile,
-    avatar_url: avatar
+    avatar_url: profile.avatar_url || 
+      `https://api.dicebear.com/9.x/avataaars/svg?seed=${encodeURIComponent(profile.name || profile.email)}&backgroundColor=b6e3f4,c0aede,d1d4f9`
   }
 }
 
